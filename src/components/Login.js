@@ -1,15 +1,17 @@
 import React from 'react'
 import Header from './Header'
+import { useNavigate } from 'react-router-dom'
 import { useState, useRef } from 'react'
 import {validate} from '../utils/validate'
-import { createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword,signInWithEmailAndPassword , updateProfile} from "firebase/auth";
 import {auth} from '../utils/firebase'
 
 const Login = () => {
-   
+   const navigate=useNavigate();
     const [isSignInForm, setIsSignInForm]=useState(true);
     const [authResult, setAuthResult]=useState(null);
 
+    const name=useRef(null);
     const email=useRef(null); // default value will go in paranthesis
     const password=useRef(null); // default value will go in paranthesis
 
@@ -27,18 +29,26 @@ const Login = () => {
         {
             if(!authResult)
             {
-                
                 createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
                 .then((userCredential) => {
                     // Signed up 
                     const user = userCredential.user;
                     console.log(user);
-                    // ...
+
+                    updateProfile(user, {
+                        displayName: name.current.value, 
+                        photoURL: "https://lh3.googleusercontent.com/ogw/AF2bZygdg-d-PzTa74JGN5pwdvpX9ONc9NVPx6w3lFBgC6a9sw=s64-c-mo"
+                      }).then(() => {
+                        // Profile updated!
+                         navigate('/browse');
+                      }).catch((error) => {
+                        // An error occurred
+                        setAuthResult(error.message);
+                      });
+
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    setAuthResult(errorMessage);
+                    setAuthResult(error.message);
                     // ..
                 });
 
@@ -51,11 +61,14 @@ const Login = () => {
                 // Signed in 
                 const user = userCredential.user;
                 console.log("logged in with :"+user);
+                navigate('/browse');
                 // ...
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                console.log(errorCode);
+                setAuthResult("Invalid Credentials");
             });
         }
 
@@ -71,7 +84,7 @@ const Login = () => {
         
         <h1 className="text-2xl font-bold">{isSignInForm?"Sign In":"Sign Up"}</h1>
         
-        {!isSignInForm && <input className="bg-gray-700 my-2 rounded w-full" type="text" placeholder="Full Name" />}
+        {!isSignInForm && <input ref={name} className="bg-gray-700 my-2 rounded w-full" type="text" placeholder="Full Name" />}
         <input ref={email} className="bg-gray-700 my-2 rounded w-full" type="text" placeholder="Email / Phone Number" />
         <input ref={password} className="bg-gray-700 my-2 rounded w-full" type="password" placeholder="Password" />
         
