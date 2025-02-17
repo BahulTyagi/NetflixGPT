@@ -44,7 +44,7 @@ const Header = () => {
         }
         });
 
-        return ()=>unSubscribe();
+        return ()=>unSubscribe(); // to remove the listener when the component unmounts
     },[])
 
   return (
