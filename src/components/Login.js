@@ -5,9 +5,14 @@ import { useState, useRef } from 'react'
 import {validate} from '../utils/validate'
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword , updateProfile} from "firebase/auth";
 import {auth} from '../utils/firebase'
+import { useDispatch } from 'react-redux'
+import { addUser } from '../utils/userSlice'
+import { photoURL } from '../utils/constants'
 
 const Login = () => {
    const navigate=useNavigate();
+
+   const dispatch=useDispatch();
     const [isSignInForm, setIsSignInForm]=useState(true);
     const [authResult, setAuthResult]=useState(null);
 
@@ -24,7 +29,7 @@ const Login = () => {
         console.log(email.current.value);
         console.log(password.current.value);
         setAuthResult(validate(email.current.value, password.current.value));
-
+        console.log("authResult is :"+authResult);
         if(!isSignInForm)  //SignUp here
         {
             if(!authResult)
@@ -37,10 +42,11 @@ const Login = () => {
 
                     updateProfile(user, {
                         displayName: name.current.value, 
-                        photoURL: "https://lh3.googleusercontent.com/ogw/AF2bZygdg-d-PzTa74JGN5pwdvpX9ONc9NVPx6w3lFBgC6a9sw=s64-c-mo"
+                        photoURL: photoURL
                       }).then(() => {
                         // Profile updated!
-                         navigate('/browse');
+                        const {uid, email, displayName, photoURL}=user;
+                        dispatch(addUser({uid:uid, email:email, displayName:displayName, photoURL:photoURL}));
                       }).catch((error) => {
                         // An error occurred
                         setAuthResult(error.message);
@@ -56,20 +62,22 @@ const Login = () => {
         }
         else
         {
-            signInWithEmailAndPassword(auth, email.current.value, password.current.value)
-            .then((userCredential) => {
-                // Signed in 
-                const user = userCredential.user;
-                console.log("logged in with :"+user);
-                navigate('/browse');
-                // ...
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode);
-                setAuthResult("Invalid Credentials");
-            });
+            if(!authResult)
+            {
+                    signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+                    .then((userCredential) => {
+                        // Signed in 
+                        const user = userCredential.user;
+                        console.log("logged in with :"+user);
+                        // ...
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        console.log(errorCode);
+                        setAuthResult("Invalid Credentials");
+                    });
+            }
         }
 
     }
