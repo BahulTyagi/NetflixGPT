@@ -7,7 +7,7 @@ import { createUserWithEmailAndPassword,signInWithEmailAndPassword , updateProfi
 import {auth} from '../utils/firebase'
 import { useDispatch } from 'react-redux'
 import { addUser } from '../utils/userSlice'
-import { photoURL } from '../utils/constants'
+import { BG_URL, photoURL } from '../utils/constants'
 
 const Login = () => {
    const navigate=useNavigate();
@@ -86,7 +86,7 @@ const Login = () => {
     <>
     <Header/>
     <div className="absolute">
-        <img src="https://assets.nflxext.com/ffe/siteui/vlv3/f268d374-734d-474f-ad13-af5ba87ef9fc/web/IN-en-20250210-TRIFECTA-perspective_92338d5d-6ccd-4b1a-8536-eb2b0240a55e_large.jpg" alt="background image"/>
+        <img src={BG_URL} alt="background image"/>
     </div>
     <form onSubmit={(e)=>{e.preventDefault()}} className="bg-opacity-80 text-white absolute w-3/12 p-12 bg-black mx-auto my-10 right-0 left-0 rounded-lg">
         

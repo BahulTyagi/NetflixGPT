@@ -3,14 +3,26 @@ import Header from './Header'
 import MainContainer from './MainContainer'
 import SecondaryContainer from './SecondaryContainer'
 import useAddMovies from '../hooks/useAddMovies'
+import { useSelector } from 'react-redux'
+import GptSearch from './GptSearch'
 
 const Browse = () => {
   useAddMovies(); // custom hook to fetch movies from tmdb server
+  
+  const gptSearch=useSelector(store=>store.gpt.showGptSearch);
+  
   return (
     <div>
       <Header/>
-      <MainContainer/>
-      <SecondaryContainer/>
+      {
+        gptSearch? 
+        <GptSearch/>:
+        <>
+          <MainContainer/>
+          <SecondaryContainer/>
+        </>
+      }
+      
     </div>
   )
 }
